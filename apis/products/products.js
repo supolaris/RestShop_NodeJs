@@ -6,25 +6,49 @@ const ProductSchema = require("../models/products");
 
 //simple get request
 router.get("/", (req, res, next) => {
-  res.status(200).json({
-    Message: "Get request from products",
-  });
+  ProductSchema.find()
+    .exec()
+    .then((docs) => {
+      console.log(docs);
+      if (docs) {
+        res.status(200).json(docs);
+      } else {
+        res.status(404);
+        res.json({
+          Message: "No products data found",
+        });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        error: err,
+      });
+    });
 });
 
 // specific get product request
 router.get("/:productId", (req, res, next) => {
   const id = req.params.productId;
-  if (id === "newProduct") {
-    res.status(200).json({
-      Message: "You got a new product",
-      Id: id,
+  ProductSchema.findById(id)
+    .exec()
+    .then((doc) => {
+      console.log("Data from mongoDb Atlas Database", doc);
+      if (doc) {
+        res.status(200).json(doc);
+      } else {
+        res.status(404);
+        res.json({
+          Message: "No valid entry found again given id",
+        });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        error: err,
+      });
     });
-  } else {
-    res.status(200).json({
-      Message: "Old product it is",
-      Id: id,
-    });
-  }
 });
 
 // simple post request
@@ -36,13 +60,19 @@ router.post("/", (req, res, next) => {
   });
   product
     .save()
-    .then((result) => console.log(result))
-    .catch((error) => console.log(error));
-
-  res.status(200).json({
-    Message: "Post request from products",
-    productData: productData,
-  });
+    .then((result) => {
+      console.log(result);
+      res.status(200).json({
+        Message: "Post request from products",
+        CreatedProduct: result,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        error: err,
+      });
+    });
 });
 
 //specific post product request
@@ -57,17 +87,38 @@ router.post("/:productId", (req, res, next) => {
 //simple delete
 router.delete("/:productId", (req, res, next) => {
   const id = req.params.productId;
-  res.status(200).json({
-    Message: `${id} product deleted`,
-  });
+  ProductSchema.deleteOne({ _id: id })
+    .exec()
+    .then((result) => {
+      res.status(500).json(result);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        error: err,
+      });
+    });
 });
 
 //patch
 router.patch("/:productId", (req, res, next) => {
   const id = req.params.productId;
-  res.status(200).json({
-    Message: `${id} product updated`,
-  });
+  const updateOps = {};
+  for (const ops of req.body) {
+    updateOps[ops.propName] = ops.value;
+  }
+  ProductSchema({ _id: id }, { $set: updateOps })
+    .exec()
+    .then((result) => {
+      console.log(result);
+      res.status(200).json(result);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        error: err,
+      });
+    });
 });
 
 module.exports = router;
