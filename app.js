@@ -1,8 +1,21 @@
 const express = require("express");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
 const app = express();
+mongoose
+  .connect(
+    "mongodb+srv://msulaman061:" +
+      process.env.MONGO_ATLAS_PW +
+      "@cluster0.qejrpku.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+  )
+  .then(() => {
+    console.log("Connected to MongoDB Atlas");
+  })
+  .catch((err) => {
+    console.error("Error connecting to MongoDB Atlas:", err);
+  });
 
 // importing apis form their files
 const productsRoutes = require("./apis/products/products");

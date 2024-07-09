@@ -1,6 +1,8 @@
 const express = require("express");
-
 const router = express.Router();
+
+const mongoose = require("mongoose");
+const ProductSchema = require("../models/products");
 
 //simple get request
 router.get("/", (req, res, next) => {
@@ -27,10 +29,16 @@ router.get("/:productId", (req, res, next) => {
 
 // simple post request
 router.post("/", (req, res, next) => {
-  const productData = {
-    productName: req.body.pName,
-    productPrice: req.body.pPrice,
-  };
+  const product = new ProductSchema({
+    _id: new mongoose.Types.ObjectId(),
+    name: req.body.ProductName,
+    price: req.body.ProductPrice,
+  });
+  product
+    .save()
+    .then((result) => console.log(result))
+    .catch((error) => console.log(error));
+
   res.status(200).json({
     Message: "Post request from products",
     productData: productData,

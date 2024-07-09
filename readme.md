@@ -23,3 +23,11 @@ parse the result/data to make it readable
 ```bash
 npm install --save body-parser
 ```
+
+## mongoose
+
+work with data of mongoDB database
+
+```bash
+npm install --save mongoose
+```
