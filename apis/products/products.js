@@ -107,7 +107,7 @@ router.patch("/:productId", (req, res, next) => {
   for (const ops of req.body) {
     updateOps[ops.propName] = ops.value;
   }
-  ProductSchema({ _id: id }, { $set: updateOps })
+  ProductSchema.updateOne({ _id: id }, { $set: updateOps })
     .exec()
     .then((result) => {
       console.log(result);
